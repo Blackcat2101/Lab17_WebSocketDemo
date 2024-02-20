@@ -5,6 +5,8 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 
+import static com.websocket.demo.chat.ChatMessage.*;
+
 @Controller
 public class chatController {
 
@@ -18,6 +20,13 @@ public class chatController {
     @SendTo("/topic/public")
     public ChatMessage addUser(ChatMessage chatMessage, SimpMessageHeaderAccessor headerAccessor) {
         headerAccessor.getSessionAttributes().put("username", chatMessage.getSender());
-        return chatMessage;
+        ChatMessage.addPeoples();
+        var chat = ChatMessage.builder().content(chatMessage.getContent())
+                .timestamp(chatMessage.getTimestamp()).sender(chatMessage.getSender()).type(MessageType.JOIN)
+                .count(getNumberOfPeople()).build();
+
+        System.out.println(getNumberOfPeople());
+        return chat;
+
     }
 }
